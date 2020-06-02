@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" http-equiv="cache-control" content="no-cache"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2 style="text-align: center;">Gráfico personalizado</h2>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 150px">Título:</span>
+                        </div>
+                        <input name="titulo" id="titulo" class="form-control" type="text" value="Ensaio">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 150px">Nome do eixo X:</span>
+                        </div>
+                        <input name="nome_x" id="nome_x" class="form-control" type="text" value="Tempo">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 150px">Nome do eixo Y:</span>
+                        </div>
+                        <input name="titulo" id="nome_y" class="form-control" type="text" value="Pressão">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 150px">Selecionar variável:</span>
+                        </div>
+                        <select class="form-control selecionar_variavel" id="selecionar_variavel">
+                            <option>Pressão e Setpoint</option>
+                            <option>Pressão</option>
+                            <option>Temperatura</option>
+                            <option>Humidade</option>
+                            <option>Setpoint</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 150px">Limites eixo y:</span>
+                        </div>
+                        <input id="ylow" name="ylow" class="form-control" type="number" value="0">
+                        <input id="yhigh" name="yhigh" class="form-control" type="number" value="1200">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 150px">Limites eixo x:</span>
+                        </div>
+                        <input id="xlow" name="xlow" class="form-control" type="datetime-local" value="2019-01-01T00:00">
+                        <input id="xhigh" name="xhigh" class="form-control" type="datetime-local"  value="2049-01-01T00:00">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 150px">Selecionar grade:</span>
+                        </div>
+                        <select class="form-control selecionar_grade" id="selecionar_grade">
+                            <option>Com grade</option>
+                            <option>Sem grade</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 150px">Tamanho:</span>
+                        </div>
+                        <input id="ltam" name="ltam" class="form-control" type="number" value="7" min="2" max="20">
+                        <input id="htam" name="htam" class="form-control" type="number" value="7" min="2" max="20">
+                    </div>
+                    <div id="msg"></div>
+                    <button type="button" id="gerar_pers" class="btn btn-primary" >Gerar Gráfico</button>
+                    <button type="button" class="btn btn-primary" onClick='javascript:location.href="{{ url_for('index') }}"'>Voltar</button>
+                    <input type="button" class="btn btn-primary" value="Tela Cheia" onclick="toggleFullScreen()">
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
+    <script type="text/javascript">
+        $("#gerar_pers").click(function(){
+            var titulo = $('#titulo').val();
+            var nome_x = $('#nome_x').val();
+            var nome_y = $('#nome_y').val();
+            var vx = $('select.selecionar_variavel option:selected').text();
+            var ylow = $('#ylow').val();
+            var yhigh = $('#yhigh').val();
+            var xlow = $('#xlow').val();
+            var xhigh = $('#xhigh').val();
+            var grade = $('select.selecionar_grade option:selected').text();
+            var ltam = $('#ltam').val();
+            var htam = $('#htam').val();
+            rrr = Math.floor(Math.random()*1000000);
+        $.post('http://127.0.0.1:5000/gerar_grafico',{
+            titulo:titulo, nome_x:nome_x, nome_y:nome_y, vx:vx, ylow:ylow, yhigh:yhigh, xlow:xlow, xhigh:xhigh, grade:grade, rrr:rrr, ltam:ltam, htam:htam
+            }, function(data) {
+                $("#msg").text(data);
+            });
+        });
+    </script>
+</body>
+
+</html>

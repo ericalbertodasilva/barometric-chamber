@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="utf-8" />
+        <title>Câmera barométrica</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='jquery.ml-keyboard.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    </head>
+    <h1 style="text-align: center;">Controle de Pressão</h1>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-8">
+                    
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 300px">Selecionar Experimento:</span>
+                        </div>
+                        <select class="form-control" id="selecionar_experimento">
+                            <option>vazio</option>
+                        </select>
+                        <button type="button" id="atualizar" class="btn btn-primary">Atualizar</button>
+                    </div>
+                    <form action="{{ url_for('executar') }}" method="post" enctype="multipart/form-data">  
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width: 300px">Nome:</span>
+                            </div>
+                            <input id="nome" name="nome" class="form-control" type="text" placeholder="nome" minlength="3">
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width: 300px">Pressão de referência (mbar):</span>
+                            </div>
+                            <input id="pressao_referencia" name="pressao_referencia" class="form-control" type="number" placeholder="pressão - mbar" step="0.1" >
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width: 300px">Tempo para atingir a pressão de ref. (s):</span>
+                            </div>
+                            <input id="tempo_atingir_referencia" name="tempo_atingir_referencia" class="form-control" type="number" placeholder="segundos" step="0.1" >
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width: 300px">Tempo na pressão de referência (s):</span>
+                            </div>
+                            <input id="tempo_estavel_referencia" name="tempo_estavel_referencia" class="form-control" type="number" placeholder="segundos" step="0.1" >
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width: 300px">Pressão de ensaio (mbar):</span>
+                            </div>
+                            <input id="pressao_de_ensaio" name="pressao_de_ensaio" class="form-control" type="number" placeholder="pressão - mbar" step="0.1" >
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width: 300px">Tempo para atingir a pressão de ensaio (s):</span>
+                            </div>
+                            <input id="tempo_atingir_ensaio" name="tempo_atingir_ensaio" class="form-control" type="number" placeholder="segundos" step="0.1" >
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width: 250px">Ativar controlador em:</span>
+                            </div>
+                            <input id="ativacao_data" name="ativacao_data" class="form-control" type="date" value="2019-01-01" min="2019-01-01" id="example-datetime-local-input">
+                            <input id="ativacao_hora" name="ativacao_hora" class="form-control" type="time" value="20:20" id="example-datetime-local-input">
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width: 250px">Desativar controlador em:</span>
+                            </div>
+                            <input id="desativacao_data" name="desativacao_data" class="form-control" type="date" value="2019-01-01" min="2019-01-01" id="example-datetime-local-input">
+                            <input id="desativacao_hora" name="desativacao_hora" class="form-control" type="time" value="22:10" id="example-datetime-local-input">
+                        </div>
+                    
+                        <div style="text-align: center;">
+                            <button type="submit" id="salvar" class="btn btn-primary">Executar</button>
+                            <button type="button" id="cancelar" class="btn btn-primary" onClick='javascript:location.href="{{ url_for('cancelar') }}"'>Cancelar</button>
+                            <button type="button" class="btn btn-primary" onClick='javascript:location.href="{{ url_for('index') }}"'>Voltar</button>
+                            <input type="button" class="btn btn-primary" value="Tela Cheia" onclick="toggleFullScreen()">
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-4">
+                    <form>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width: 150px">Temperatura:</span>
+                            </div>
+                        
+                            <input id="temp" class="form-control" type="number" placeholder="°C" disabled>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width: 150px">Umidade:</span>
+                            </div>
+                            <input id="humi" class="form-control" type="number" placeholder="%" disabled>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width: 150px">Pressão:</span>
+                            </div>
+                            <input id="pres" class="form-control" type="number" placeholder="mBar" disabled>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width: 150px">Estágio:</span>
+                            </div>
+                            <input id="esta" class="form-control" type="number" placeholder="Estágio" disabled>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
+        <script type="text/javascript">
+        var rr;
+        $(document).ready(function() {
+            $.post('http://127.0.0.1:5000/_get_monitor', function(data) {
+                rr=data;
+                $("#esta").val(data['estado']);
+                $("#pres").val(data['pressao']);
+                $("#temp").val(data['temperatura']);
+                $("#humi").val(data['UR']);
+                });
+            setInterval(function () {
+                $.post('http://127.0.0.1:5000/_get_monitor', function(data) {
+                rr=data;
+                $("#esta").val(data['estado']);
+                $("#pres").val(data['pressao']);
+                $("#temp").val(data['temperatura']);
+                $("#humi").val(data['UR']);
+                });
+            }, 5000);
+        })
+        </script>
+
+    </body>
+
+</html>
+
+
+

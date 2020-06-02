@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Câmera barométrica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Nome do Projeto:</span>
+                        </div>
+                        <input class="form-control" type="text" placeholder="Nome"  id="nm" disabled>
+                    </div>
+                <div id='curve_chart1'></div>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" onClick='javascript:location.href="{{ url_for('monitorar') }}"'>Voltar</button>
+<input type="button" class="btn btn-primary" value="Tela Cheia" onclick="toggleFullScreen()">
+
+
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='loader.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='grafico2.js') }}"></script>
+    
+    <script type="text/javascript">
+    var contr=0;
+    var rr;
+    var graf;
+    var graf2;
+    var nome = $("#nm").val()
+    $(document).ready(function() {
+	nome = $("#nm").val()
+        $.post('http://127.0.0.1:5000/_get_monitor', function(data) {
+            rr=data;
+            $("#nm").val(data['nome']);
+        });
+
+        setInterval(function() {
+	    nome = $("#nm").val()
+            $.post('http://127.0.0.1:5000/_get_monitor', function(data) {
+                rr=data;
+                $("#nm").val(data['nome']);
+            });
+	    if(nome!="parado" && contr==0){
+		    $.post('http://127.0.0.1:5000/_get_grafico',{
+	            nome:nome
+	        }, function(data) {
+	            graf2=JSON.parse(data);
+                var i = 0;
+                if(nome!="parado"){
+                    for(i = 0; i < graf2.length; i++){
+                        pres[0] = new Date(graf2[i]["data_registro"]);
+                        pres[1] = parseFloat(graf2[i]["pressao"]);
+                        pres[2] = parseFloat(graf2[i]["setpoint"]);
+                        data1.addRow(pres);
+                    }
+                    var chart1 = new google.visualization.LineChart(document.getElementById('curve_chart1'));
+                    chart1.draw(data1, options1);
+                }
+            });
+            contr = 1
+	    }
+
+            
+            $.post('http://127.0.0.1:5000/_get_grafico_ponto',{
+            nome:nome
+            }, function(data) {
+                graf=JSON.parse(data);
+                pres[0] = new Date(graf[0]["data_registro"]);
+                pres[1] = parseFloat(graf[0]["pressao"]);
+                pres[2] = parseFloat(graf[0]["setpoint"]);
+                data1.addRow(pres);
+                var chart1 = new google.visualization.LineChart(document.getElementById('curve_chart1'));
+                chart1.draw(data1, options1);
+            });
+        }, 5000);
+        setTimeout(function(){ location.reload(); }, 600000);
+    })
+    </script>
+    
+</body>
+
+</html>
+
+
+

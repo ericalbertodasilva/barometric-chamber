@@ -1,0 +1,23 @@
+﻿body {
+    background-color: #EFFBFB;
+    font-family: Carlito;
+}
+.caixa-controle {
+    padding: 10px 10px 10px 10px;
+    margin: 20px 5px 5px 5px;
+    border-width: 1px;
+    border-style: dotted;
+    border-color: black;
+    border-radius: 2px;
+}
+.saidas{
+    background-color: lightblue;
+    font-size: 25px;
+}
+.saidas-unidade{
+    font-size: 25px;
+    color: black;
+}
+.graf {
+    background-color:rgb(255, 255, 255);
+}

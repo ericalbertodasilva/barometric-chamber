@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Câmera barométrica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='jquery.ml-keyboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <h1 style="text-align: center;">Cadastrar Experimento</h1>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <form action="{{ url_for('criar_ensaio') }}" method="post" enctype="multipart/form-data"> 
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 350px">Nome do Projeto:</span>
+                        </div>
+                        <input id="nome" class="form-control jQKeyboard" type="text" placeholder="Nome" name="cadastro_nome" maxlength="99" minlength="3">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 350px">Pressão de referência (mbar):</span>
+                        </div>
+                        <input class="form-control" type="number" placeholder="pressão - mbar" name="cadastro_p_ref" min="860" max="1040" step="0.1">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 350px">Tempo para atingir a pressão de referência (s):</span>
+                        </div>
+                        <input class="form-control" type="number" placeholder="segundos" name="cadastro_t_a_p_ref" min="0" step="0.1">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 350px">Tempo na pressão de referência (s):</span>
+                        </div>
+                        <input class="form-control" type="number" placeholder="segundos" name="cadastro_t_p_ref" min="0" step="0.1">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 350px">Pressão de ensaio (mbar):</span>
+                        </div>
+                        <input class="form-control" type="number" placeholder="pressão - mbar" name="cadastro_p_e" min="860" max="1040" step="0.1">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 350px">Tempo para atingir a pressão de ensaio (s):</span>
+                        </div>
+                        <input class="form-control" type="number" placeholder="segundos" name="cadastro_t_a_p_e" min="0" step="0.1">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 350px">Ativar controlador em:</span>
+                        </div>
+                        <input class="form-control" type="date" value="2019-01-14" id="example-datetime-local-input" name="cadastro_a_c_d" min="2019-01-14">
+                        <input class="form-control" type="time" value="20:20" id="example-datetime-local-input" name="cadastro_a_c_t">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 350px">Desativar controlador em:</span>
+                        </div>
+                        <input class="form-control" type="date" value="2019-01-14" id="example-datetime-local-input" name="cadastro_d_c_d" min="2019-01-14">
+                        <input class="form-control" type="time" value="22:10" id="example-datetime-local-input" name="cadastro_d_c_t">
+                    </div>
+                    <div style="text-align: center;">
+                        <button type="submit" id="salvar" class="btn btn-primary">Salva</button>
+                        <button type="button" id="limpar" class="btn btn-primary" onClick="document.location.reload(true)">Limpar</button>
+                        <button type="button" class="btn btn-primary" onClick='javascript:location.href="{{ url_for('index') }}"'>Voltar</button>
+                        <input type="button" class="btn btn-primary" value="Tela Cheia" onclick="toggleFullScreen()">
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
+    
+
+</body>
+
+</html>
+
+
+

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Câmera barométrica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-4">
+            <h2 style="text-align: center;">Monitorar</h2>
+                <form>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">Nome do Projeto:</span>
+                        </div>
+                        <input class="form-control" type="text" placeholder="Nome"  id="nm" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">Estágio:</span>
+                        </div>
+                        <input class="form-control" type="text" placeholder="Estágio" id="esta" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">Pressão:</span>
+                        </div>
+                        <input class="form-control" type="number" placeholder="mBar"  id="pres" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">Temperatura:</span>
+                        </div>
+                        <input class="form-control" type="number" placeholder="°C"  id="temp" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">Umidade:</span>
+                        </div>
+                        <input class="form-control" type="number" placeholder="%"  id="humi" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">Posição da Val. Pressão:</span>
+                        </div>
+                        <input class="form-control" type="number" placeholder="%" id="ppre" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">Posição da Val. Vacuo:</span>
+                        </div>
+                        <input class="form-control" type="number" placeholder="%" id="pvac" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">Bomba:</span>
+                        </div>
+                        <input class="form-control" type="text" placeholder=" " id="sbom" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">Controle:</span>
+                        </div>
+                        <input class="form-control" type="text" placeholder=" " id="spid" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">setpoint:</span>
+                        </div>
+                        <input class="form-control" type="number" placeholder="mBar" id="setp" disabled>
+                    </div>
+                    <button type="button" class="btn btn-primary" onClick='javascript:location.href="{{ url_for('index') }}"'>Voltar</button>
+		    <button type="button" class="btn btn-primary" onClick='javascript:location.href="{{ url_for('grafico_pressao') }}"'>Pressão</button>
+                    <button type="button" id="cancelar" class="btn btn-primary" onClick='javascript:location.href="{{ url_for('cancelar') }}"'>Cancelar</button>
+		    <input type="button" class="btn btn-primary" value="Tela Cheia" onclick="toggleFullScreen()">
+                </form>
+            </div>
+            <div class="col-lg-8">
+                <div id='curve_chart1'></div>
+                <div id='curve_chart2'></div>
+                <div id='curve_chart3'></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='loader.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='grafico.js') }}"></script>
+    
+    <script type="text/javascript">
+    var contr=0;
+    var rr;
+    var graf;
+    var graf2;
+    var nome = $("#nm").val()
+    $(document).ready(function() {
+	nome = $("#nm").val()
+        $.post('http://127.0.0.1:5000/_get_monitor', function(data) {
+            rr=data;
+            $("#nm").val(data['nome']);
+            $("#esta").val(data['estado']);
+            $("#pres").val(data['pressao']);
+            $("#temp").val(data['temperatura']);
+            $("#humi").val(data['UR']);
+            $("#ppre").val(Math.round(data['pwm_valvula_pressao']/1.024)/10);
+            $("#pvac").val(Math.round(data['pwm_valvula_vacuo']/1.024)/10);
+            if (data['status_bomba'] > 0){
+                $("#sbom").val("Ligada");
+            } else {
+                $("#sbom").val("Desligada");
+            }
+            if (data['status_pid'] > 0){
+                $("#spid").val("Ligado");
+            } else {
+                $("#spid").val("Desligado");
+            }
+            $("#setp").val(data['setpoint']);
+        });
+
+        setInterval(function() {
+	    nome = $("#nm").val()
+            $.post('http://127.0.0.1:5000/_get_monitor', function(data) {
+                rr=data;
+                $("#nm").val(data['nome']);
+                $("#esta").val(data['estado']);
+                $("#pres").val(data['pressao']);
+                $("#temp").val(data['temperatura']);
+                $("#humi").val(data['UR']);
+                $("#ppre").val(Math.round(data['pwm_valvula_pressao']/1.024)/10);
+                $("#pvac").val(Math.round(data['pwm_valvula_vacuo']/1.024)/10);
+                if (data['status_bomba'] > 0){
+                    $("#sbom").val("Ligada");
+                } else {
+                    $("#sbom").val("Desligada");
+                }
+                if (data['status_pid'] > 0){
+                    $("#spid").val("Ligado");
+                } else {
+                    $("#spid").val("Desligado");
+                }
+                $("#setp").val(data['setpoint']);
+            });
+	    if(nome!="parado" && contr==0){
+		    $.post('http://127.0.0.1:5000/_get_grafico',{
+	            nome:nome
+	        }, function(data) {
+	            graf2=JSON.parse(data);
+                var i = 0;
+                if(nome!="parado"){
+                    for(i = 0; i < graf2.length; i++){
+                        pres[0] = new Date(graf2[i]["data_registro"]);
+                        pres[1] = parseFloat(graf2[i]["pressao"]);
+                        pres[2] = parseFloat(graf2[i]["setpoint"]);
+                        temp[0] = new Date(graf2[i]["data_registro"]);
+                        temp[1] = parseFloat(graf2[i]["temperatura"]);
+                        humi[0] = new Date(graf2[i]["data_registro"]);
+                        humi[1] = parseFloat(graf2[i]["UR"]);
+                        data1.addRow(pres);
+                        data2.addRow(temp);
+                        data3.addRow(humi);
+                    }
+                    var chart1 = new google.visualization.LineChart(document.getElementById('curve_chart1'));
+                    chart1.draw(data1, options1);
+                    var chart2 = new google.visualization.LineChart(document.getElementById('curve_chart2'));
+                    chart2.draw(data2, options2);
+                    var chart3 = new google.visualization.LineChart(document.getElementById('curve_chart3'));
+                    chart3.draw(data3, options3);
+                }
+            });
+            contr = 1
+	    }
+
+            
+            $.post('http://127.0.0.1:5000/_get_grafico_ponto',{
+            nome:nome
+            }, function(data) {
+                graf=JSON.parse(data);
+                pres[0] = new Date(graf[0]["data_registro"]);
+                pres[1] = parseFloat(graf[0]["pressao"]);
+                pres[2] = parseFloat(graf[0]["setpoint"]);
+                temp[0] = new Date(graf[0]["data_registro"]);
+                temp[1] = parseFloat(graf[0]["temperatura"]);
+                humi[0] = new Date(graf[0]["data_registro"]);
+                humi[1] = parseFloat(graf[0]["UR"]);
+                data1.addRow(pres);
+                data2.addRow(temp);
+                data3.addRow(humi);
+                var chart1 = new google.visualization.LineChart(document.getElementById('curve_chart1'));
+                chart1.draw(data1, options1);
+                var chart2 = new google.visualization.LineChart(document.getElementById('curve_chart2'));
+                chart2.draw(data2, options2);
+                var chart3 = new google.visualization.LineChart(document.getElementById('curve_chart3'));
+                chart3.draw(data3, options3);
+            });
+        }, 5000);
+        setTimeout(function(){ location.reload(); }, 600000);
+    })
+    </script>
+    
+</body>
+
+</html>
+
+
+

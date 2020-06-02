@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Câmera barométrica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+                <div class="col-lg-3"></div>
+                <div class="col-lg-6">
+                    <img src="{{ url_for('static', filename='inct.png') }}" alt="INCT"  style="height: 100%; width: 100%;">
+                </div>
+            </div>
+            <h1 style="text-align: center;">Sistema de Controle e Monitoramento da Camara Barométrica</h1>
+            <div class="row">
+                <div class="col-lg-3">
+                    <button type="button" class="btn btn-primary" style="font-size: 40px; height: 184px; width: 100%;" onClick='javascript:location.href="{{ url_for('monitorar') }}"'>
+                        Monitorar <br/> Parametros
+                    </button>
+                </div>
+                <div class="col-lg-3">
+                    <button type="button" class="btn btn-primary" style="font-size: 40px; height: 184px; width: 100%;" onClick='javascript:location.href="{{ url_for('controle') }}"'>
+                        Controle <br/> de Pressão
+                    </button>
+                </div>
+                <div class="col-lg-3">
+                    <button type="button" class="btn btn-primary" style="font-size: 40px; height: 184px; width: 100%;" onClick='javascript:location.href="{{ url_for('cadastro') }}"'>
+                        Cadastrar <br/> Experimento</button>
+                </div>
+                <div class="col-lg-3">
+                    <button type="button" class="btn btn-primary" style="font-size: 40px; height: 80px; width: 100%;" onClick='javascript:location.href="{{ url_for('manual') }}"'>
+                        Manual
+                        </button>
+                        </br></br>
+                    <button type="button" class="btn btn-primary" style="font-size: 40px; height: 80px; width: 100%;" onClick='javascript:location.href="{{ url_for('graficos') }}"'>
+                        Gráficos
+                        </button>
+                </div>
+        </div>
+    </div>
+    <footer style="text-align: center;">
+            <p><b>Eric Alberto da Silva ME</b> - Celular: 19 9 8198-7800</p>
+        </footer>
+    <input type="button" class="btn btn-primary" value="Tela Cheia" onclick="toggleFullScreen()">
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Câmera barométrica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6">
+            	<h1 style="text-align: center;">Comando Manual</h1>
+
+                <div class="input-group mb-3">
+                    
+                    <div class="input-group-prepend">
+
+                        <span class="input-group-text" style="width: 200px">Nome do projeto:</span>
+
+                    </div>
+
+                    <input class="form-control" type="text" placeholder="Nome"  id="nm" disabled>
+
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" style="width: 200px">Status bomba:</span>
+                    </div>
+                    <input class="form-control" type="text" id="sbom" disabled> 
+                    <div style="text-align: center;">
+                        <button type="button" class="btn btn-primary" id="ligar_bomba">Ligar</button>
+                        <button type="button" class="btn btn-primary" id="desligar_bomba">Desligar</button>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" style="width: 200px">Status controle:</span>
+                    </div>
+                    <input class="form-control" type="text" id="spid" disabled> 
+                    <div style="text-align: center;">
+                        <button type="button" class="btn btn-primary" id="ligar_pid">Ligar</button>
+                        <button type="button" class="btn btn-primary" id="desligar_pid">Desligar</button>
+                    </div>
+                </div>
+                <form action="{{ url_for('valvula_pressao') }}" method="post" enctype="multipart/form-data">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">Posição válvula de pressão:</span>
+                        </div>
+                        <input class="form-control" type="number" id="ppre" placeholder="%" disabled>
+                        <input class="form-control" type="number" id="ppressao" min="0" max="100" step="0.1" value="0">
+                        <button type="button" class="btn btn-primary" id="gravar_v_pressao">Atualizar</button>
+                    </div>
+                </form>
+                <form action="{{ url_for('valvula_vacuo') }}" method="post" enctype="multipart/form-data">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">Posição válvula de vácuo:</span>
+                        </div>
+                        <input class="form-control" type="number" id="pvac" placeholder="%" disabled>
+                        <input class="form-control" type="number" id="pvacuo" min="0" max="100" step="0.1" value="0">
+                        <button type="button" class="btn btn-primary" id="gravar_v_vacuo">Atualizar</button>
+                    </div>
+                </form>
+                <form action="{{ url_for('valvula_vacuo') }}" method="post" enctype="multipart/form-data">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 200px">Setpoint:</span>
+                        </div>
+                        <input class="form-control" type="number" id="setp" placeholder="%" disabled>
+                        <input class="form-control" type="number" id="sp" min="860" max="1040" step="0.1" value="860">
+                        <button type="button" class="btn btn-primary" id="gravar_setpoint">Atualizar</button>
+                    </div>
+                </form>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" style="width: 200px">Pressão:</span>
+                    </div>
+                    <input class="form-control" type="number" placeholder="mBar"  id="pres" disabled>
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" style="width: 200px">Estágio:</span>
+                    </div>
+                    <input class="form-control" type="text" placeholder="Estágio" id="esta" disabled>
+                </div>
+                <button type="button" class="btn btn-primary" onClick='javascript:location.href="{{ url_for('index') }}"'>Voltar</button>
+                <button type="button" id="cancelar" class="btn btn-primary" onClick='javascript:location.href="{{ url_for('cancelar') }}"'>Cancelar</button>
+                <input type="button" class="btn btn-primary" value="Tela Cheia" onclick="toggleFullScreen()">
+            </div>
+            <div class="col-lg-6">
+                <div id='curve_chart1'></div>
+                <div id='curve_chart2'></div>
+                <div id='curve_chart3'></div>
+            </div>
+        </div>
+        
+    </div>  
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='loader.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='grafico.js') }}"></script>
+    <script type="text/javascript">
+    var rr;
+    $(document).ready(function() {
+        $.post('http://127.0.0.1:5000/_get_monitor', function(data) {
+            rr=data;
+            $("#nm").val(data['nome']);
+            $("#esta").val(data['estado']);
+            $("#pres").val(data['pressao']);
+            $("#temp").val(data['temperatura']);
+            $("#humi").val(data['UR']);
+            $("#ppre").val(Math.round(data['pwm_valvula_pressao']/1.024)/10);
+            $("#pvac").val(Math.round(data['pwm_valvula_vacuo']/1.024)/10);
+            if (data['status_bomba'] > 0){
+                $("#sbom").val("Ligada");
+            } else {
+                $("#sbom").val("Desligada");
+            }
+            if (data['status_pid'] > 0){
+                $("#spid").val("Ligado");
+            } else {
+                $("#spid").val("Desligado");
+            }
+            $("#setp").val(data['setpoint']);
+            $("#kp").val(data['kp']);
+            $("#kd").val(data['kd']);
+            $("#ki").val(data['ki']);
+            });
+        setInterval(function () {
+            $.post('http://127.0.0.1:5000/_get_monitor', function(data) {
+            rr=data;
+            $("#esta").val(data['estado']);
+            $("#pres").val(data['pressao']);
+            $("#temp").val(data['temperatura']);
+            $("#humi").val(data['UR']);
+            $("#ppre").val(Math.round(data['pwm_valvula_pressao']/1.024)/10);
+            $("#pvac").val(Math.round(data['pwm_valvula_vacuo']/1.024)/10);
+            if (data['status_bomba'] > 0){
+                $("#sbom").val("Ligada");
+            } else {
+                $("#sbom").val("Desligada");
+            }
+            if (data['status_pid'] > 0){
+                $("#spid").val("Ligado");
+            } else {
+                $("#spid").val("Desligado");
+            }
+            $("#setp").val(data['setpoint']);
+            $("#kp").val(data['kp']);
+            $("#kd").val(data['kd']);
+            $("#ki").val(data['ki']);
+            });
+
+            var nome = $("#nm").val()
+            $.post('http://127.0.0.1:5000/_get_grafico_ponto',{
+            nome:nome
+            }, function(data) {
+                graf=JSON.parse(data);
+                pres[0] = new Date(graf[0]["data_registro"]);
+                pres[1] = parseFloat(graf[0]["pressao"]);
+                pres[2] = parseFloat(graf[0]["setpoint"]);
+                temp[0] = new Date(graf[0]["data_registro"]);
+                temp[1] = parseFloat(graf[0]["temperatura"]);
+                humi[0] = new Date(graf[0]["data_registro"]);
+                humi[1] = parseFloat(graf[0]["UR"]);
+                data1.addRow(pres);
+                data2.addRow(temp);
+                data3.addRow(humi);
+                var chart1 = new google.visualization.LineChart(document.getElementById('curve_chart1'));
+                chart1.draw(data1, options1);
+                var chart2 = new google.visualization.LineChart(document.getElementById('curve_chart2'));
+                chart2.draw(data2, options2);
+                var chart3 = new google.visualization.LineChart(document.getElementById('curve_chart3'));
+                chart3.draw(data3, options3);
+            });
+        }, 5000);
+        setTimeout(function(){ location.reload(); }, 600000);
+        })
+        $("#gravar_setpoint").click(function(){
+            var sp = $('#sp').val()
+            $.post('http://127.0.0.1:5000/setpoint',{
+            sp:sp
+            }, function(data) {});
+        });
+    
+    </script>
+
+</body>
+
+</html>
