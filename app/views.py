@@ -103,6 +103,11 @@ def executar():
     att = str(request.form['ativacao_hora'])
     ded = str(request.form['desativacao_data'])
     det = str(request.form['desativacao_hora'])
+    p = Ensaios(nome=nome, pressao_referencia=p_ref, tempo_atingir_referencia=ta, tempo_estavel_referencia=tr,
+                pressao_de_ensaio=p_ensaio, tempo_atingir_ensaio=te, ativacao_data=atd, ativacao_hora=att,
+                desativacao_data=ded, desativacao_hora=det)
+    db.session.add(p)
+    db.session.commit()
     # Converte tempo inicial em segundos
     atc=(atd+" "+att)
     at=datetime.strptime(atc, "%Y-%m-%d %H:%M")
